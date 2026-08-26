@@ -431,7 +431,46 @@ def cmd_digest(argv):
     return 0
 
 
+USAGE = """pr-watch - outbound ledger + daily harvest digest for YOUR PRs and issues
+in OTHER people's repos. Needs the `gh` CLI. Zero LLM calls, no API key.
+
+  pr-watch                            tick: snapshot every registered position,
+                                      autodiscover your own open PRs, alert on change
+  pr-watch --sync                     autodiscover only, then stop
+  pr-watch --add <url> [--note TEXT]  register a PR or issue by URL
+  pr-watch --digest [--send]          harvest from saved snapshots (0 network calls)
+  pr-watch --dry-run                  do not write anything
+  pr-watch --help                     this text
+
+Config: $PR_WATCH_CONFIG, else ~/.pr-watch/config.json
+Docs:   https://github.com/tonydzi/pr-watch"""
+
+# Flags main() itself understands. An unknown flag must NOT fall through to the tick:
+# a mistyped flag that silently runs a live pass against GitHub looks like success and
+# is indistinguishable from the command you meant. Refuse instead.
+KNOWN_FLAGS = {"--dry-run", "--add", "--digest", "--sync", "--note", "--send",
+               "--help", "-h"}
+
+
 def main():
+    argv = sys.argv[1:]
+    if "--help" in argv or "-h" in argv:
+        print(USAGE)
+        return 0
+    # skip the value of --note, which is free text and may legitimately start with "-"
+    scan, skip = [], False
+    for a in argv:
+        if skip:
+            skip = False
+            continue
+        if a == "--note":
+            skip = True
+        scan.append(a)
+    unknown = [a for a in scan if a.startswith("-") and a not in KNOWN_FLAGS]
+    if unknown:
+        print("pr-watch: unknown option(s): %s" % " ".join(unknown), file=sys.stderr)
+        print("try: pr-watch --help", file=sys.stderr)
+        return 2
     dry = "--dry-run" in sys.argv
     if "--add" in sys.argv:
         return cmd_add(sys.argv[1:])

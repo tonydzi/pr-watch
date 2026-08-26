@@ -105,6 +105,21 @@ def main():
     rows = {(p["repo"], p["number"]) for p in json.load(open(cfg_path))["prs"]}
     check("merge-write: no lost rows", rows == {("a/a", 1), ("b/b", 9), ("c/c", 7)})
 
+    # 6. an unrecognised flag must refuse, not quietly run a live tick.
+    #    Point a broken config at it too: if the guard ever regresses, the run would
+    #    fall through and exit 2 for the WRONG reason, so assert on the message.
+    open(cfg_path, "w").write("{ broken")
+    r = run(["--nonsense"], env)
+    check("unknown flag: refuses with exit 2",
+          r.returncode == 2 and "unknown option" in (r.stdout + r.stderr))
+    check("unknown flag: does not run the tick",
+          "heartbeat" not in (r.stdout + r.stderr))
+
+    # 7. --help prints usage and exits 0 even when the config is unreadable
+    r = run(["--help"], env)
+    check("--help: exit 0 + usage, no config read",
+          r.returncode == 0 and "--digest" in r.stdout and "heartbeat" not in r.stdout)
+
     shutil.rmtree(tmp, ignore_errors=True)
     print("\n%d checks, %d failed" % (total[0], len(fails)))
     return 1 if fails else 0

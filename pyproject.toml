@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pr-watch"
-version = "1.0.0"
+version = "1.0.1"
 description = "Outbound ledger + daily harvest digest for the pull requests and issues you opened in other people's repos. One file, stdlib, gh CLI, zero LLM."
 readme = "README.md"
 requires-python = ">=3.8"
