@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pr-watch"
+version = "1.0.0"
+description = "Outbound ledger + daily harvest digest for the pull requests and issues you opened in other people's repos. One file, stdlib, gh CLI, zero LLM."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Palo Alto AI Research Lab" }]
+keywords = ["github", "pull-requests", "ledger", "digest", "open-source", "contributions", "cli"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Version Control :: Git",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/tonydzi/pr-watch"
+Source = "https://github.com/tonydzi/pr-watch"
+Issues = "https://github.com/tonydzi/pr-watch/issues"
+Changelog = "https://github.com/tonydzi/pr-watch/releases"
+
+[project.scripts]
+pr-watch = "pr_watch:main"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["pr_watch.py"]
+
+[tool.hatch.build.targets.sdist]
+include = ["pr_watch.py", "test_pr_watch.py", "README.md", "LICENSE", "pyproject.toml"]
