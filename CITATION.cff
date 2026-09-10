@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use pr-watch in research or software, please cite it as below."
+title: "pr-watch"
+type: software
+authors:
+  - family-names: Dziatkovskii
+    given-names: Anton
+    orcid: "https://orcid.org/0000-0001-7408-3054"
+    affiliation: "Palo Alto AI Research Lab"
+repository-code: "https://github.com/tonydzi/pr-watch"
+url: "https://github.com/tonydzi/pr-watch"
+abstract: >-
+  An outbound ledger and daily harvest digest for your PRs and issues in other people's repositories.
