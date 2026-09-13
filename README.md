@@ -1,14 +1,12 @@
 # pr-watch
 
-An **outbound ledger + daily harvest digest** for your PRs and issues in *other people's* repos.
+An **outbound ledger + daily harvest digest** for your PRs and issues in *other people's* repos, in one file: [pr_watch.py](pr_watch.py).
 One file, stdlib only, needs just the [`gh` CLI](https://cli.github.com/). Zero LLM calls.
 
 ## The problem
 
 You contribute across many repositories. GitHub notifications drown. The thread where a
-maintainer answered you three days ago is exactly the one you never see. In our own use,
-5 PRs from 3 strangers sat unanswered for 4 days — not out of rudeness, but because no
-single list of "everything we have out there" existed anywhere.
+maintainer answered you three days ago is exactly the one you never see. In our own use in 2026, 5 PRs from 3 strangers sat unanswered for 4 days — not out of rudeness, but because no single list of "everything we have out there" existed anywhere.
 
 ## What it does
 
@@ -18,12 +16,9 @@ python3 pr_watch.py                                                # tick: snaps
 python3 pr_watch.py --digest                                       # harvest: who owes whom a reply
 ```
 
-The **tick** snapshots every registered position and alerts on: new comments and reviews,
-changed review verdicts, label changes, new commits, CI conclusion changes, title changes,
-merge/close. Deleted comments and other exotic transitions are deliberately out of scope.
+The **tick** in [pr_watch.py](pr_watch.py) snapshots every registered position and alerts on: new comments and reviews, changed review verdicts, label changes, new commits, CI conclusion changes, title changes, merge/close. Deleted comments and other exotic transitions are deliberately out of scope.
 
-The tick also auto-discovers your open PRs via `gh search prs --author`, so a PR opened
-from another machine still lands in the ledger.
+The tick also auto-discovers your open PRs via `gh search prs --author`, so a PR opened from another machine still lands in the ledger kept by [pr_watch.py](pr_watch.py).
 
 The **digest** reads only saved snapshots (0 network calls) and splits the ledger into:
 
@@ -39,13 +34,12 @@ closed (17):
 ```
 
 **BALL WITH US** is the section that matters: a human wrote after you, and silence past
-one day is how contributions die.
+one day is how contributions die, which is the whole reason [pr_watch.py](pr_watch.py) exists.
 
 ## The graves rule
 
-In our merge history, every merge happened **0–3 days** after the last maintainer touch.
-Nothing merged later, ever. So after `grave_days` of silence a thread goes to the graves
-section: one polite bump before that is fine, a second one never helped anyone. Spend the
+In our own merge history through 2026, every merge happened **0–3 days** after the last maintainer touch.
+Nothing merged later, ever. So after the `grave_days` window set in [pr_watch.py](pr_watch.py) a thread goes to the graves section: one polite bump before that is fine, a second one never helped anyone. Spend the
 time on living threads instead. Tune `grave_days` if your ecosystem is slower.
 
 ## Setup
@@ -78,7 +72,7 @@ or your own script. Empty = print to stdout (fine for cron with mail delivery).
 ## Design decisions
 
 - **Comment bodies are never stored or relayed.** Snapshots keep only id/author/date —
-  external text is data, not instructions, and an alert should not become an injection vector.
+  external text is data, not instructions, and an alert should not become an injection vector; the rule is enforced in [pr_watch.py](pr_watch.py) and covered by [test_pr_watch.py](test_pr_watch.py).
 - **First snapshot is silent** — adopting 30 existing PRs doesn't produce an alert storm.
 - **Fetch failures alert once**, on the ok→error transition, and name the remedy.
 - **Undelivered alerts are not lost**: if `alert_cmd` fails, state isn't saved, so the same
@@ -87,7 +81,7 @@ or your own script. Empty = print to stdout (fine for cron with mail delivery).
   by `(repo, number)`. This is best-effort — it fixes the common read-modify-write race between
   machines sharing the file through a sync folder, but it is not a lock; truly simultaneous
   writers can still race.
-- **"0 new" can't lie**: if autodiscovery couldn't query GitHub at all, it says so and
+- **"0 new" can't lie**: if autodiscovery couldn't query GitHub at all, [pr_watch.py](pr_watch.py) says so and
   exits non-zero instead of reporting a clean empty result.
 
 ## Origin
@@ -96,8 +90,7 @@ Extracted from the live infrastructure of [Palo Alto AI Research Lab](https://gi
 we run it nightly over ~90 positions across the Anthropic / OpenAI / Google / HuggingFace /
 MCP ecosystems. Battle scars from that use are in the comments.
 
-If you try it on your own contribution backlog, open an issue with what broke or what's
-missing — field reports from other workflows are exactly what we want. We're also happy
+If you try it on your own contribution backlog, open an issue at https://github.com/tonydzi/pr-watch/issues with what broke or what's missing — field reports from other workflows are exactly what we want. We're also happy
 to hand test seats of our other tooling to engineers who like breaking things.
 
 ## License
@@ -110,9 +103,9 @@ MIT
 
 ## 🧩 One piece of a working system
 
-This repository is one piece lifted out of a live operation: one non-technical founder, an AI
-cofounder, and a fleet of machines that reach consensus with each other and wake the human only
-for money or the irreversible. It was extracted after it survived production, not written as a
+This repository is one piece lifted out of a live operation mapped in [SYSTEM.md](https://github.com/tonydzi/tonydzi/blob/main/SYSTEM.md):
+one non-technical founder, an AI cofounder, and a fleet of machines that reach consensus with
+each other and wake the human only for money or the irreversible. It was extracted after it survived production, not written as a
 demo — and it runs on its own: nothing here phones home to the rest.
 
 **See how the whole thing fits together → [SYSTEM.md](https://github.com/tonydzi/tonydzi/blob/main/SYSTEM.md)**
@@ -121,7 +114,8 @@ demo — and it runs on its own: nothing here phones home to the rest.
 
 ## AI contributors
 
-This project is built by a human + AI team, and the git log says so: Claude writes most of
+This project is built by a human + AI team, and the git log says so under the rules in
+[AI-CONTRIBUTORS.md](https://github.com/tonydzi/.github/blob/main/AI-CONTRIBUTORS.md): Claude writes most of
 the code, Codex and Grok review it, Gemini feeds the research. Each is credited on a commit
 **only if its output changed that commit's content** — no decorative credits. Lab-wide
 policy, one source for every repo: [AI-CONTRIBUTORS.md](https://github.com/tonydzi/.github/blob/main/AI-CONTRIBUTORS.md).
