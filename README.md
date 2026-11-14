@@ -7,10 +7,10 @@ A tiny tool that tells you every morning which of your pull requests and issues 
 
 ## Quick start
 1. Install the [GitHub CLI](https://cli.github.com/) and run `gh auth login`.
-2. Save `{"authors": ["your-github-login"], "grave_days": 3, "alert_cmd": "", "prs": []}` as `~/.pr_watch.json`.
-3. Run `python3 pr_watch.py --sync`, then `python3 pr_watch.py --digest`.
+2. Save `{"authors": ["your-github-login"], "grave_days": 3, "alert_cmd": "", "prs": []}` as `.pr_watch.json` in your home folder (`~/.pr_watch.json`; on Windows `C:/Users/<you>/.pr_watch.json`).
+3. Run `python3 pr_watch.py --sync` (finds your open PRs), then `python3 pr_watch.py` once (takes a snapshot of each; writes `~/.pr_watch_state`), then `python3 pr_watch.py --digest`. On Windows use `python` if `python3` opens the Microsoft Store.
 
-**Done when:** the digest prints a line like `harvest <date> - N positions in the ledger` and lists your open PRs.
+**Done when:** the digest prints a line like `harvest <date> - N positions in the ledger` with N above 0, and lists your open PRs. If you run `--digest` before the snapshot step, each PR shows `no snapshot yet - run a tick first`; if N is 0, nothing is being watched yet.
 
 > Want an AI agent to do it for you? Paste this to Claude Code / Codex / Cursor:
 > "Read the 'For AI agents' section of https://github.com/tonydzi/pr-watch and set it up for me."
@@ -44,9 +44,11 @@ Config is JSON. Lookup order, first found wins: `$PR_WATCH_CONFIG`, `./pr_watch.
 ### Verify
 ```bash
 python3 test_pr_watch.py
-python3 pr_watch.py --digest --dry-run
+python3 pr_watch.py --sync
+python3 pr_watch.py
+python3 pr_watch.py --digest
 ```
-Expected: the first prints `16 checks, 0 failed` and exits `0` (offline, no network). The second prints `harvest <date> ... N positions in the ledger` and exits `0`. Run `python3 pr_watch.py --sync` once to fill the ledger from the human's open PRs.
+Expected: the first prints `16 checks, 0 failed` and exits `0` (offline, no network). `--sync` prints `autodiscover: +N positions` (exit `4` and `NOT QUERIED` means `gh` is down or rate limited, so the ledger is unverified). The bare run is the tick: it writes snapshots to `~/.pr_watch_state` and may send an alert through `alert_cmd`, so keep `alert_cmd` empty for the first run. The digest prints `harvest <date> ... N positions in the ledger` and exits `0`; on an empty ledger it still exits `0` with `0 positions`, so that alone proves nothing: require N above 0 and no `no snapshot yet` lines.
 
 ### Uninstall / rollback
 - `pip uninstall pr-watch` if you used `pip install .`.
