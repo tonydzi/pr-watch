@@ -442,7 +442,7 @@ in OTHER people's repos. Needs the `gh` CLI. Zero LLM calls, no API key.
   pr-watch --dry-run                  do not write anything
   pr-watch --help                     this text
 
-Config: $PR_WATCH_CONFIG, else ~/.pr-watch/config.json
+Config: $PR_WATCH_CONFIG, else ./pr_watch.json, else ~/.pr_watch.json
 Docs:   https://github.com/tonydzi/pr-watch"""
 
 # Flags main() itself understands. An unknown flag must NOT fall through to the tick:
